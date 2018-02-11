@@ -14,14 +14,14 @@ plugin_package = "octoprint_pantilt"
 plugin_name = "OctoPrint-PanTilt"
 
 # The plugin's version. Can be overwritten within OctoPrint's internal data via __plugin_version__ in the plugin module
-plugin_version = "0.1.0"
+plugin_version = "0.2.0"
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module
 plugin_description = """Enables you to execute a program to pan/tilt your camera"""
 
 # The plugin's author. Can be overwritten within OctoPrint's internal data via __plugin_author__ in the plugin module
-plugin_author = "Marc Hannappel"
+plugin_author = "Marc Hannappel and Marc Boivin"
 
 # The plugin's author's mail address.
 plugin_author_email = "salandora@gmail.com"
@@ -33,7 +33,7 @@ plugin_url = "https://github.com/Salandora/OctoPrint-PanTilt"
 plugin_license = "AGPLv3"
 
 # Any additional requirements besides OctoPrint should be listed here
-plugin_requires = []
+plugin_requires = ["RPIO"]
 
 ### --------------------------------------------------------------------------------------------------------------------
 ### More advanced options that you usually shouldn't have to touch follow after this point

@@ -12,6 +12,7 @@ from __future__ import absolute_import
 import octoprint.plugin
 import sarge
 import flask
+from RPIO import PWM
 
 class PantiltPlugin(octoprint.plugin.SettingsPlugin,
                     octoprint.plugin.AssetPlugin,
@@ -22,11 +23,9 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 	def __init__(self):
 		self.panValue = 0
 		self.tiltValue = 0
-		self.pantiltHandlers = None
 
 	def on_after_startup(self):
-		self.pantiltHandlers = self._plugin_manager.get_hooks("octoprint.plugin.pantilt_handler")
-		self.callScript(self._settings.get(["pan", "initialValue"]), self._settings.get(["tilt", "initialValue"]))
+        pass
 
 
 	def get_template_configs(self):
@@ -37,7 +36,6 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 	##~~ SettingsPlugin mixin
 	def get_settings_defaults(self):
 		return dict(
-			pathToScript="",
 			pan=dict(
 				initialValue=50,
 				minValue=0,
@@ -56,37 +54,12 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 		self.panValue = max(self._settings.get(["pan", "minValue"]), min(self._settings.get(["pan", "maxValue"]), panValue))
 		self.tiltValue = max(self._settings.get(["tilt", "minValue"]), min(self._settings.get(["tilt", "maxValue"]), tiltValue))
 
-		# if there are anly pantilt handlers, loop through them, then return
-		if len(self.pantiltHandlers) > 0:
-			values = {'pan': self.panValue, 'panMin': self._settings.get(["pan", "minValue"]),
-					  'panMax': self._settings.get(["pan", "maxValue"]),
-					  'tilt': self.tiltValue, 'tiltMin': self._settings.get(["tilt", "minValue"]),
-					  'tiltMax': self._settings.get(["tilt", "maxValue"])}
-			for name, handler in self.pantiltHandlers.items():
-				handler(values)
-			return
-
 		script = self._settings.get(["pathToScript"])
 		if script == "":
 			return
 
-		self._logger.info("Performing command: {}".format(script))
 		try:
-			# we run this with shell=True since we have to trust whatever
-			# our admin configured as command and since we want to allow
-			# shell-alike handling here...
-			p = sarge.run(sarge.shell_format('{0} {1} {2}', script, panValue, tiltValue),
-			              stdout=sarge.Capture(),
-			              stderr=sarge.Capture(),
-			              shell=True,
-			              async=False)
-			if p.returncode != 0:
-				returncode = p.returncode
-				stdout_text = p.stdout.text
-				stderr_text = p.stderr.text
-
-				error = "Command failed with return code {}:\nSTDOUT: {}\nSTDERR: {}".format(returncode, stdout_text, stderr_text)
-				self._logger.warn(error)
+				self._logger.warn("Not doing anything yet")
 		except Exception, e:
 			error = "Command failed: {}".format(str(e))
 			self._logger.warn(error)
@@ -155,7 +128,7 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 		# for details.
 		return dict(
 			pantilt=dict(
-				displayName="Pantilt Plugin",
+				displayName="Pantilt Plugin with RPi GPIO Headers",
 				displayVersion=self._plugin_version,
 
 				# version check: github repository
@@ -183,4 +156,3 @@ def __plugin_load__():
 	__plugin_hooks__ = {
 		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
 	}
-
