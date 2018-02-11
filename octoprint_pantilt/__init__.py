@@ -23,6 +23,15 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 	def __init__(self):
 		self.panValue = 0
 		self.tiltValue = 0
+        self.defaultStepSize = 10
+
+        # Create two servo objects using the RPIO PWM library
+        self.servoPan = PWM.Servo()
+        self.servoTilt = PWM.Servo()
+
+        # Setup the two servos and turn both to 90 degrees
+        self.servoPan.set_servo(23, angleMap(self._settings.get(["pan", "initialValue"])))
+        self.servoTilt.set_servo(22, angleMap(self._settings.get(["tilt", "initialValue"])))
 
 	def on_after_startup(self):
         pass
@@ -54,12 +63,11 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 		self.panValue = max(self._settings.get(["pan", "minValue"]), min(self._settings.get(["pan", "maxValue"]), panValue))
 		self.tiltValue = max(self._settings.get(["tilt", "minValue"]), min(self._settings.get(["tilt", "maxValue"]), tiltValue))
 
-		script = self._settings.get(["pathToScript"])
-		if script == "":
-			return
-
 		try:
-				self._logger.warn("Not doing anything yet")
+            self.servoTilt.set_servo(22, angleMap(tiltValue))
+            self.servoPan.set_servo(23, angleMap(panValue))
+            
+			self._logger.warn("Not doing anything yet")
 		except Exception, e:
 			error = "Command failed: {}".format(str(e))
 			self._logger.warn(error)
@@ -94,7 +102,8 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 		elif command == "left" or command == "right":
 			panValue = self.panValue
 
-			stepSize = 1
+            # Redundant reference, but in the future we'll support dynamic steps
+			stepSize = self.defaultStepSize
 			if stepSize in data:
 				stepSize = int(data["stepSize"])
 
@@ -107,7 +116,7 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 		elif command == "up" or command == "down":
 			tiltValue = self.tiltValue
 
-			stepSize = 1
+			stepSize = self.defaultStepSize
 			if stepSize in data:
 				stepSize = int(data["stepSize"])
 
@@ -141,6 +150,14 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 				pip="https://github.com/Salandora/OctoPrint-PanTilt/archive/{target_version}.zip"
 			)
 		)
+
+    # This function maps the angle we want to move the servo to, to the needed PWM value
+    def angleMap(self, angle):
+	       return int((round((1950.0/180.0),0)*angle) +550)
+
+    def cleanup(self):
+        servo.stop_servo(23)
+        servo.stop_servo(22)
 
 
 # If you want your plugin to be registered within OctoPrint under a different name than what you defined in setup.py
