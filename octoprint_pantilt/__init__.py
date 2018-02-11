@@ -12,7 +12,16 @@ from __future__ import absolute_import
 import octoprint.plugin
 import sarge
 import flask
-from RPIO import PWM
+import RPi.GPIO as GPIO
+
+# Use board mode, less confusing for users
+GPIO.setmode(GPIO.BOARD)
+
+# Set the pins for PWM
+GPIO.setup(11,GPIO.OUT)
+GPIO.setup(12,GPIO.OUT)
+
+
 
 class PantiltPlugin(octoprint.plugin.SettingsPlugin,
                     octoprint.plugin.AssetPlugin,
@@ -26,12 +35,14 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
         self.defaultStepSize = 10
 
         # Create two servo objects using the RPIO PWM library
-        self.servoPan = PWM.Servo()
-        self.servoTilt = PWM.Servo()
+        self.servoPan = GPIO.PWM(11,50)
+        self.servoTilt = GPIO.PWM(12,50)
 
-        # Setup the two servos and turn both to 90 degrees
-        self.servoPan.set_servo(23, angleMap(self._settings.get(["pan", "initialValue"])))
-        self.servoTilt.set_servo(22, angleMap(self._settings.get(["tilt", "initialValue"])))
+
+
+        # Setup the two servos and turn both to 180 degrees
+        self.servoPan.start(5)
+        self.servoTilt.start(5)
 
 	def on_after_startup(self):
         pass
@@ -64,10 +75,9 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 		self.tiltValue = max(self._settings.get(["tilt", "minValue"]), min(self._settings.get(["tilt", "maxValue"]), tiltValue))
 
 		try:
-            self.servoTilt.set_servo(22, angleMap(tiltValue))
-            self.servoPan.set_servo(23, angleMap(panValue))
-            
-			self._logger.warn("Not doing anything yet")
+            self.servoTilt.changeDutyCycle(get_duty_from_angle(tiltValue))
+            self.servoPan.changeDutyCycle(get_duty_from_angle(panValue))
+
 		except Exception, e:
 			error = "Command failed: {}".format(str(e))
 			self._logger.warn(error)
@@ -151,13 +161,18 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 			)
 		)
 
-    # This function maps the angle we want to move the servo to, to the needed PWM value
-    def angleMap(self, angle):
-	       return int((round((1950.0/180.0),0)*angle) +550)
+    # This function maps the angle we want to move the servo to,
+    # to the needed PWM value
+    # http://www.toptechboy.com/raspberry-pi/raspberry-pi-lesson-28-controlling-a-servo-on-raspberry-pi-with-python/
+    def get_duty_from_angle(angle):
+        angle = angle + 2
+        # Ratio is 1/18
+        ratio = 0.05555555556
+        duty = ratio*angle
+        return duty
 
     def cleanup(self):
-        servo.stop_servo(23)
-        servo.stop_servo(22)
+        GPIO.cleanup()
 
 
 # If you want your plugin to be registered within OctoPrint under a different name than what you defined in setup.py
