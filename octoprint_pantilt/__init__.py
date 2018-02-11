@@ -32,20 +32,17 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 	def __init__(self):
 		self.panValue = 0
 		self.tiltValue = 0
-        self.defaultStepSize = 10
+		self.defaultStepSize = 10
 
         # Create two servo objects using the RPIO PWM library
-        self.servoPan = GPIO.PWM(11,50)
-        self.servoTilt = GPIO.PWM(12,50)
+		self.servoPan = GPIO.PWM(11,50)
+		self.servoTilt = GPIO.PWM(12,50)
 
 
 
         # Setup the two servos and turn both to 180 degrees
-        self.servoPan.start(5)
-        self.servoTilt.start(5)
-
-	def on_after_startup(self):
-        pass
+		self.servoPan.start(5)
+		self.servoTilt.start(5)
 
 
 	def get_template_configs(self):
