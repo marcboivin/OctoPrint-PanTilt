@@ -72,8 +72,8 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 		self.tiltValue = max(self._settings.get(["tilt", "minValue"]), min(self._settings.get(["tilt", "maxValue"]), tiltValue))
 
 		try:
-			self.servoTilt.changeDutyCycle(get_duty_from_angle(tiltValue))
-			self.servoPan.changeDutyCycle(get_duty_from_angle(panValue))
+			self.servoTilt.ChangeDutyCycle(self.get_duty_from_angle(tiltValue))
+			self.servoPan.ChangeDutyCycle(self.get_duty_from_angle(panValue))
 
 		except Exception, e:
 			error = "Command failed: {}".format(str(e))
@@ -163,7 +163,7 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
     # This function maps the angle we want to move the servo to,
     # to the needed PWM value
     # http://www.toptechboy.com/raspberry-pi/raspberry-pi-lesson-28-controlling-a-servo-on-raspberry-pi-with-python/
-	def get_duty_from_angle(angle):
+	def get_duty_from_angle(self, angle):
 		angle = angle + 2
 		# Ratio is 1/18
 		ratio = 0.05555555556
