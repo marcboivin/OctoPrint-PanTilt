@@ -33,7 +33,7 @@ plugin_url = "https://github.com/Salandora/OctoPrint-PanTilt"
 plugin_license = "AGPLv3"
 
 # Any additional requirements besides OctoPrint should be listed here
-plugin_requires = ["RPIO"]
+plugin_requires = ["RPi"]
 
 ### --------------------------------------------------------------------------------------------------------------------
 ### More advanced options that you usually shouldn't have to touch follow after this point

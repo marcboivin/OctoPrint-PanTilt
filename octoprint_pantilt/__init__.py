@@ -12,7 +12,6 @@ from __future__ import absolute_import
 import octoprint.plugin
 import sarge
 import flask
-import RPi.GPIO as GPIO
 
 # Use board mode, less confusing for users
 GPIO.setmode(GPIO.BOARD)
@@ -27,7 +26,8 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
                     octoprint.plugin.AssetPlugin,
                     octoprint.plugin.TemplatePlugin,
                     octoprint.plugin.SimpleApiPlugin,
-                    octoprint.plugin.StartupPlugin):
+                    octoprint.plugin.StartupPlugin,
+					octoprint.plugins.ShutdownPlugin):
 
 	def __init__(self):
 		self.panValue = 0
@@ -43,7 +43,6 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
         # Setup the two servos and turn both to 180 degrees
 		self.servoPan.start(5)
 		self.servoTilt.start(5)
-
 
 	def get_template_configs(self):
 		return [
@@ -137,6 +136,8 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 	def on_api_get(self, request):
 		return flask.jsonify(panValue=self.panValue, tiltValue=self.tiltValue)
 
+	def on_shutdown(self):
+		self.cleanup()
 	##~~ Softwareupdate hook
 	def get_update_information(self):
 		# Define the configuration for your plugin to use with the Software Update
@@ -149,7 +150,7 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
 
 				# version check: github repository
 				type="github_release",
-				user="Salandora",
+				user="marcboivin",
 				repo="OctoPrint-PanTilt",
 				current=self._plugin_version,
 
