@@ -12,6 +12,7 @@ from __future__ import absolute_import
 import octoprint.plugin
 import sarge
 import flask
+import RPi.GPIO as GPIO
 
 # Use board mode, less confusing for users
 GPIO.setmode(GPIO.BOARD)
