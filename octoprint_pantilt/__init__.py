@@ -28,7 +28,7 @@ class PantiltPlugin(octoprint.plugin.SettingsPlugin,
                     octoprint.plugin.TemplatePlugin,
                     octoprint.plugin.SimpleApiPlugin,
                     octoprint.plugin.StartupPlugin,
-					octoprint.plugins.ShutdownPlugin):
+					octoprint.plugin.ShutdownPlugin):
 
 	def __init__(self):
 		self.panValue = 0
