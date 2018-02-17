@@ -11,10 +11,9 @@ def angleToServo(angle):
         angle = angle/180
         angle = angle * 0.111
 
-        angle = angle + Decimal(0.3667)
         # Adjust based on non scientific method
         angle = angle + Decimal(0.036667)
-        print angle
+
         return angle
 
 cmd = "echo \"17=%f 18=%f\" > /dev/pi-blaster"
@@ -29,6 +28,3 @@ print cmd
 
 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
 output, error = process.communicate()
-
-0.036667
-0.147778
