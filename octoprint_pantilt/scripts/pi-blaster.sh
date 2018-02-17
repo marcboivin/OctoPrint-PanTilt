@@ -9,7 +9,7 @@ def angleToServo(angle):
         angle = Decimal(angle)
 
         angle = angle/180
-        angle = angle * Deciaml(0.111)
+        angle = angle * Decimal(0.111)
 
         # Adjust based on non scientific method
         angle = angle + Decimal(0.036667)
