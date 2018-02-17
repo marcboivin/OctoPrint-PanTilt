@@ -1,10 +1,19 @@
-#!/bin/sh
+#!/usr/bin/python
 
+import sys
+import subprocess
+from decimal import Decimal
 
-pan=$(python -c "print $1/100")
-pan=$(python -c "print $pan+0.12")
+def angleToServo(angle):
+	angle = Decimal(angle)
+	angle = angle/100
+	angle += 0.12
 
-tilt=$(python -c "print $1/100")
-tilt=$(python -c "print $tilt+0.12")
+cmd = "echo \"17=%d 18=%d\" > /dev/pi-blaster"
 
-echo "17=$pan 18=$tilt" > /dev/pi-blaster
+pan = angleToServo(sys.argv[1])
+
+tilt = angleToServo(sys.argv[2])
+
+process = subprocess.Popen(bashCommand % (pan,tilt), stdout=subprocess.PIPE)
+output, error = process.communicate()
