@@ -5,13 +5,15 @@ import subprocess
 from decimal import Decimal
 
 def angleToServo(angle):
-        print angle
-        angle = Decimal(angle)
-        print angle
-        angle = angle/180
 
+        angle = Decimal(angle)
+
+        angle = angle/180
+        angle = angle * 0.111
+
+        angle = angle + Decimal(0.3667)
         # Adjust based on non scientific method
-        angle = angle + Decimal(0.12)
+        angle = angle + Decimal(0.036667)
         print angle
         return angle
 
@@ -27,3 +29,6 @@ print cmd
 
 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
 output, error = process.communicate()
+
+0.036667
+0.147778
